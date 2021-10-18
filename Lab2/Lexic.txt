@@ -1,0 +1,29 @@
+Alphabet:
+	a. Upper (A-Z) and lower case letters(a-z) of the english alphabet;
+	b. Underline character '_";
+	c. Decimal digits(0-9);
+Lexic:
+	a. special symbols, representing:
+		- operators + - * / = == < <= > >= && ||
+		- separators () [] {} ; newline space
+		- reserved words: char else func for if int main nil switch string var 
+	b. identifiers
+		- a sequence of letters and digits, such that the first character is a letter; the rule is:
+			identifier := letter{digit | letter} | "_"
+			letter := "a" | "b" | ... | "z" | "A" | "B" | ... | "Z"
+			digit := "0" | "1" | ... | "9"
+	c. constants
+		1. integer - rule:
+			noconst := ["+" | "-"]no
+			no := nz_digit{digit}
+			nz_digit := "1" | "2" | ... "9"
+		2. character
+			charconst := "'"[letter | digit]"'"
+		3. string
+			stringconst := """{letter | digit}"""
+		4. null
+			nullconst = "nil"
+	
+	
+	
+
