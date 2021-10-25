@@ -2,6 +2,7 @@ package symtable
 
 import "errors"
 
+// Item represents an entity stored in the SymbolTable.
 type Item struct {
 	Key      string
 	Value    string
@@ -133,5 +134,4 @@ func (st *SymbolTable) getIndex(k string) (i uint) {
 	i = hc % st.size
 
 	return
-
 }
