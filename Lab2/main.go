@@ -2,7 +2,8 @@ package main
 
 import "fmt"
 
-func main() {
-	fmt.Println("Hello World")
+// import "github.com/alexpetrean80/FLCD/symtable"
 
+func main() {
+	fmt.Println("Hello World!")
 }
