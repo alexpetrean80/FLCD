@@ -13,7 +13,7 @@ type Item struct {
 // hashFunc computes the hashcode of a string and returns it.
 // The hashcode is the sum of all characters' ASCII codes.
 func hashFunc(val string) (hashCode uint) {
-	hashCode = 0
+	hashCode = 1
 
 	for _, ch := range val {
 		hashCode += uint(ch)
@@ -33,8 +33,8 @@ type SymbolTable struct {
 // New is a function for constructing the SymbolTable struct, abstracting away unneeded details about it.
 func New() *SymbolTable {
 	return &SymbolTable{
-		items: make([]*Item, 10),
-		size:  10,
+		items: make([]*Item, 11),
+		size:  11,
 	}
 }
 
@@ -66,9 +66,9 @@ func (st *SymbolTable) Add(k, v string) {
 	if float64(st.size) >= 0.7 {
 		temp := st.items
 
-		st.items = make([]*Item, 2*st.size)
+		st.items = make([]*Item, 3*st.size)
 
-		st.size = 2 * st.size
+		st.size = 3 * st.size
 
 		for _, x := range temp {
 			for x != nil {
