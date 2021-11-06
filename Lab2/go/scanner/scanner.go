@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"log"
 	"os"
-	"regexp"
 
 	"github.com/alexpetrean80/FLCD/symtable"
 )
@@ -38,6 +37,8 @@ func (s *Scanner) Scan(path string) error {
 	if err = fr.Err(); err != nil {
 		return err
 	}
+
+	return nil
 }
 
 func getToken() string {
@@ -45,30 +46,30 @@ func getToken() string {
 }
 
 func isReservedWord(token string) bool {
-	// char else func for if int main nil switch string var
-	re, err := regexp.Compile(`(char|else|func|for|if|int|main|nil|switch|string|var){1}`)
+	reservedWords := []string{"char", "else", "func", "for", "if", "int", "main", "nil", "string", "var"}
+	return contains(reservedWords, token)
 }
 
 func isOperator(token string) bool {
-	// + - * / = == < <= > >= && ||
-	re, err := regexp.Compile(`[\+-*/<>(={1,2})(<=)(>=)(&&)(||)]`)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return re.MatchString(token)
+	operators := []string{"+", "-", "*", "/", "=", "==", "<", "<=", ">", ">=", "&&", "||"}
+	return contains(operators, token)
 }
 
 func isSeparator(token string) bool {
-	// () [] {} ;
-	re, err := regexp.Compile(`\(\)\[\]\{\}\;`)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return re.MatchString(token)
+	separators := []string{"(", ")", "[", "]", "{", "}", ";"}
+	return contains(separators, token)
 }
 
 func genPIF() {
 
+}
+
+func contains(arr []string, str string) bool {
+	for _, a := range arr {
+		if a == str {
+			return true
+		}
+	}
+
+	return false
 }
