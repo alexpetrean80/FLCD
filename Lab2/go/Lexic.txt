@@ -6,7 +6,7 @@ Lexic:
 	a. special symbols, representing:
 		- operators + - * / = == < <= > >= && ||
 		- separators () [] {} ; newline space
-		- reserved words: char else func for if int main nil switch string var 
+		- reserved words: char else func for if int main nil switch string var print
 	b. identifiers
 		- a sequence of letters and digits, such that the first character is a letter; the rule is:
 			identifier := letter{digit | letter} | "_"

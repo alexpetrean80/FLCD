@@ -1,0 +1,5 @@
+{token: gcd}
+{token: x}
+{token: y}
+{token: return}
+{token: res}

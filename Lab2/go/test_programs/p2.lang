@@ -1,0 +1,13 @@
+func gcd(x int, y int) int {
+    if x == 0 {
+        return y;
+    }
+
+    return gcd(y % x, x);
+}
+
+func main() {
+    res := gcd(124, 342);
+
+    print(res);
+}

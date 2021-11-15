@@ -1,0 +1,20 @@
+func main() {
+    ax := 2;
+    b := 3;
+    c := 4;
+    if ax > b {
+        if ax > c {
+            print(ax);
+        }
+    }
+    if b >= ax {
+        if b > c {
+            print(b);
+        }
+    }
+    if c > ax {
+        if c > b {
+            print(c);
+        }
+    }
+}

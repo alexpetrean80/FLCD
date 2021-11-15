@@ -1,0 +1,103 @@
+PROGRAM = {FUNC} MAINFUNC;
+
+
+(* functions *)
+FUNC = "func" IDENTIFIER PARAMETERS [TYPE] COMPOUNDSTMT ;
+
+MAINFUNC = "func" "main" "(" ")" COMPOUNDSTMT;
+
+PARAMETERS = "(" [PARAM] | PARAMLIST ")";
+
+PARAMLIST = {PARAM ","} PARAM;
+
+PARAM = IDENTIFIER TYPE;
+
+
+(* statements *)
+COMPOUNDSTMT = "{" SIMPLESTMT 
+	| IFSTMT 
+	| FORSTMT (";"|"\n")} SIMPLESTMT "}";
+
+SIMPLESTMT = UNARYOP 
+	| BINARYOP 
+	| DECLSTMT
+	| ASSIGNSTMT 
+	| INITSTMT
+  | PRINTSTMT;
+
+PRINTSTMT = "print(" EXPR ")" 
+
+DECLSTMT = "var" IDENTIFIER TYPE;
+
+ASSIGNSTMT = IDENTIFIER "=" EXPR;
+
+INITSTMT = IDENTIFIER "=" EXPR | DECLSTMT "=" EXPR;
+
+IFSTMT = "if" CONDOP COMPOUNDSTMT {"else"  COMPOUNDSTMT };
+
+FORSTMT = "for" [CONDOP | (INITSTMT; CONDOP; UNARYOP | ASSIGNSTMT)] COMPOUNDSTMT;
+
+OUTSTMT = "Print" "(" EXPR ")"
+
+(* types *)
+TYPE = PRIMITIVETYPE | ARRAYTYPE;
+
+PRIMITIVETYPE = "int" | "char" | "string";
+
+ARRAYTYPE = "[" NR "]" TYPE;
+
+
+(* operations *)
+EXPR = IDENTIFIER
+	| CONST
+	| FUNCALL 
+	| OP;
+
+OP = UNARYOP 
+	| BINARYOP
+	| CONDOP;
+
+UNARYOP = IDENTIFIER ("+""+" | "-""-");
+
+BINARYOP = IDENTIFIER ("+" | "-" | "*" | "/") IDENTIFIER;
+
+CONDOP = EXPR REL EXPR;
+
+FUNCALL = IDENTIFIER PARAMETERS;
+
+
+(* lexic *)
+IDENTIFIER = (LETTER{DIGIT | LETTER}) | "_";
+
+LETTER = "A" | "B" | "C" | "D" | "E" | "F" | "G"
+	| "H" | "I" | "J" | "K" | "L" | "M" | "N"
+        | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+       	| "V" | "W" | "X" | "Y" | "Z" | "a" | "b"
+       	| "c" | "d" | "e" | "f" | "g" | "h" | "i"
+       	| "j" | "k" | "l" | "m" | "n" | "o" | "p"
+       	| "q" | "r" | "s" | "t" | "u" | "v" | "w"
+       	| "x" | "y" | "z";
+
+DIGIT = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+NZ_DIGIT = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+
+CHAR = DIGIT | LETTER;
+
+REL = "<" | ">" | "<=" | ">=" | "==" | "!=" | "&&" | "||";
+
+
+(* constants *)
+CONST = NOCONST
+	| CHARCONST 
+	| STRCONST 
+	| NULLCONST;
+
+NOCONST = ["+" | "-"] NO;
+
+NO = NZ_DIGIT{DIGIT};
+
+CHARCONST = "'" [CHAR] "'";
+
+STRCONST = """ {CHAR} """;
+
+NULLCONST = "nil";
