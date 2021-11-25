@@ -1,0 +1,20 @@
+{
+    "terminals": {
+        "a": true,"b": true,"c": true
+    },
+    "nonTerminals": {
+        "S": true,
+        "A":true,
+        "B": true, 
+        "C": true,
+        "D": true
+    },
+    "startingSymbol": "S",
+    "productions": {
+        "S": ["aA", "aC"],
+        "A": ["AB"],
+        "B": ["b"],
+        "C": ["aC", "CD"],
+        "D": ["b"]
+    }
+}
