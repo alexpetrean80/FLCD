@@ -6,13 +6,6 @@ import (
 	"os"
 )
 
-type Terminal string
-
-type NonTerminal string
-
-type Production struct {
-}
-
 type Grammar struct {
 	Terminals      map[Terminal]bool          `json:"terminals"`
 	NonTerminals   map[NonTerminal]bool       `json:"nonTerminals"`
