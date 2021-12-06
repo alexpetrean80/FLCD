@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	g := grammar.New("./grammar.json")
+	g := grammar.New("./grammar.txt")
 	fmt.Println(g)
 }
