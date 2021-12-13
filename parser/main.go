@@ -9,5 +9,6 @@ import (
 func main() {
 	g := grammar.New("./grammar.txt")
 	p := parser.New()
-	fmt.Println(p.Parse(*g, []grammar.Terminal{"abcd"}))
+	fmt.Println(p.Parse(*g, []grammar.Terminal{"aab"}))
+	fmt.Println(p)
 }

@@ -39,13 +39,16 @@ func New() *parser {
 
 func (p *parser) Parse(g gr.Grammar, w []gr.Terminal) string {
 	p.is.Push(g.StartingSymbol)
-	for p.state != Final {
+	for p.state != Final && p.state != Error {
 		inputTop, err := p.is.Top()
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		workingTop, err := p.ws.Top()
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		if !inputTop.IsTerminal() {
 			p.expand(g, w)
@@ -89,7 +92,6 @@ func (p *parser) expand(g gr.Grammar, w []gr.Terminal) {
 	for i := len(prod) - 1; i >= 0; i-- {
 		p.is.Push(prod[i])
 	}
-
 }
 
 func (p *parser) advance(g gr.Grammar, w []gr.Terminal) {
@@ -109,6 +111,10 @@ func (p *parser) momentaryInsucces() {
 }
 
 func (p *parser) back(g gr.Grammar, w []gr.Terminal) {
+	if p.index == 0 {
+		p.state = Error
+		return
+	}
 	p.index--
 	t, err := p.ws.Pop()
 	if err != nil {

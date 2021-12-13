@@ -46,7 +46,7 @@ func (s *stack) Top() (sym g.Symbol, err error) {
 	top := s.l.Front()
 
 	if top == nil {
-		return nil, nil
+		return g.Terminal(""), nil
 	}
 
 	sym = top.Value.(g.Symbol)
