@@ -141,6 +141,7 @@ func (p *parser) anotherTry(g gr.Grammar, w []gr.Terminal) {
 		}
 	} else {
 		if _, err := p.ws.Pop(); err != nil {
+			p.state = Error
 			log.Fatal(err.Error() + fmt.Sprintf(" - Syntax error: word %s is not accepted by the grammar.", w))
 		}
 
