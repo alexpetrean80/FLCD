@@ -11,6 +11,7 @@ type Stack interface {
 	Pop() (g.Symbol, error)
 	Top() (g.Symbol, error)
 	Peek(uint) (g.Symbols, error)
+	List() []g.Symbol
 	Empty() bool
 }
 
@@ -42,12 +43,15 @@ func (s *stack) Pop() (sym g.Symbol, err error) {
 }
 
 func (s *stack) Top() (sym g.Symbol, err error) {
-	sym, ok := s.l.Front().Value.(g.Symbol)
-	if !ok {
-		err = errors.New("error casting stack value to symbol")
+	top := s.l.Front()
+
+	if top == nil {
+		return nil, nil
 	}
 
-	return
+	sym = top.Value.(g.Symbol)
+
+	return sym, nil
 }
 
 func (s *stack) Peek(count uint) (syms g.Symbols, err error) {
@@ -73,4 +77,14 @@ func (s *stack) Peek(count uint) (syms g.Symbols, err error) {
 
 func (s *stack) Empty() bool {
 	return s.l.Len() == 0
+}
+
+func (s stack) List() []g.Symbol {
+	l := []g.Symbol{}
+
+	for e := s.l.Front(); e != nil; e = e.Next() {
+		l = append(l, e.Value.(g.Symbol))
+	}
+
+	return l
 }

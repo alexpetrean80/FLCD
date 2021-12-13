@@ -6,6 +6,7 @@ import (
 	"log"
 	gr "parser/grammar"
 	st "parser/stack"
+	"strings"
 )
 
 const initialIndex = 0
@@ -14,7 +15,7 @@ const noProd = -1
 const firstProd = 0
 
 type Parser interface {
-	Parse(gr.Grammar, []gr.Terminal)
+	Parse(gr.Grammar, []gr.Terminal) string
 	Reset()
 }
 
@@ -36,7 +37,8 @@ func New() *parser {
 	}
 }
 
-func (p *parser) Parse(g gr.Grammar, w []gr.Terminal) {
+func (p *parser) Parse(g gr.Grammar, w []gr.Terminal) string {
+	p.is.Push(g.StartingSymbol)
 	for p.state != Final {
 		inputTop, err := p.is.Top()
 		if err != nil {
@@ -44,9 +46,6 @@ func (p *parser) Parse(g gr.Grammar, w []gr.Terminal) {
 		}
 
 		workingTop, err := p.ws.Top()
-		if err != nil {
-			log.Fatal(err)
-		}
 
 		if !inputTop.IsTerminal() {
 			p.expand(g, w)
@@ -58,7 +57,7 @@ func (p *parser) Parse(g gr.Grammar, w []gr.Terminal) {
 			}
 		}
 
-		if workingTop.IsTerminal() {
+		if workingTop == nil || workingTop.IsTerminal() {
 			p.back(g, w)
 		} else if p.state == Back {
 			p.anotherTry(g, w)
@@ -69,6 +68,8 @@ func (p *parser) Parse(g gr.Grammar, w []gr.Terminal) {
 		}
 
 	}
+
+	return p.getStringOfProductions()
 }
 
 func (p *parser) Reset() {
@@ -152,4 +153,21 @@ func (p *parser) anotherTry(g gr.Grammar, w []gr.Terminal) {
 
 func (p *parser) succes() {
 	p.state = Final
+}
+
+func (p *parser) getStringOfProductions() string {
+	syms := p.ws.List()
+
+	op := p.ops.Front()
+	strBuilder := strings.Builder{}
+
+	for _, sym := range syms {
+		if !sym.IsTerminal() {
+			productionStr := fmt.Sprintf("%s %s, ", sym, op.Value)
+			strBuilder.WriteString(productionStr)
+		}
+		op = op.Next()
+	}
+
+	return strBuilder.String()
 }
