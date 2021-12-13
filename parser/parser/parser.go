@@ -2,6 +2,7 @@ package parser
 
 import (
 	"container/list"
+	"fmt"
 	"log"
 	gr "parser/grammar"
 	st "parser/stack"
@@ -140,7 +141,7 @@ func (p *parser) anotherTry(g gr.Grammar, w []gr.Terminal) {
 		}
 	} else {
 		if _, err := p.ws.Pop(); err != nil {
-			log.Fatal(err)
+			log.Fatal(err.Error() + fmt.Sprintf(" - Syntax error: word %s is not accepted by the grammar.", w))
 		}
 
 		p.ops.Remove(p.ops.Front())
