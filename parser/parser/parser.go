@@ -15,7 +15,7 @@ const noProd = -1
 const firstProd = 0
 
 type Parser interface {
-	Parse(gr.Grammar, []gr.Terminal) string
+	Parse(gr.Grammar, []gr.Terminal) (string, error)
 	Reset()
 }
 
@@ -37,42 +37,62 @@ func New() *parser {
 	}
 }
 
-func (p *parser) Parse(g gr.Grammar, w []gr.Terminal) string {
+func (p *parser) Parse(g gr.Grammar, w []gr.Terminal) (string, error) {
+	p.Reset()
 	p.is.Push(g.StartingSymbol)
+
 	for p.state != Final && p.state != Error {
-		inputTop, err := p.is.Top()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		workingTop, err := p.ws.Top()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		if !inputTop.IsTerminal() {
-			p.expand(g, w)
+		fmt.Println(p)
+		if p.index < len(w) {
+			fmt.Println(w[p.index:])
 		} else {
-			if inputTop == w[p.index] {
-				p.advance(g, w)
+			fmt.Println(nil)
+		}
+		fmt.Println("--------------------------------------------")
+		if p.state == Normal {
+
+			if p.index == len(w) && p.is.Empty() {
+				p.succes()
 			} else {
-				p.momentaryInsucces()
+
+				iTop, err := p.is.Top()
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				if !iTop.IsTerminal() {
+					p.expand(g, w)
+				} else {
+					iTopTerminal := iTop.(gr.Terminal)
+					var currentTerminal gr.Terminal = gr.Terminal("")
+
+					if p.index < len(w) {
+						currentTerminal = w[p.index]
+					}
+					if iTopTerminal == currentTerminal {
+						p.advance(g, w)
+					} else {
+						p.momentaryInsucces()
+					}
+				}
+
+			}
+		} else if p.state == Back {
+			wTop, _ := p.ws.Top()
+
+			if wTop.IsTerminal() {
+				p.back(g, w)
+			} else {
+				p.anotherTry(g, w)
 			}
 		}
-
-		if workingTop == nil || workingTop.IsTerminal() {
-			p.back(g, w)
-		} else if p.state == Back {
-			p.anotherTry(g, w)
-		}
-
-		if p.index == len(w) && p.is.Empty() {
-			p.succes()
-		}
-
 	}
 
-	return p.getStringOfProductions()
+	if p.state == Error {
+		return "", fmt.Errorf("syntax error: %s not accepted.", w)
+	}
+
+	return p.getStringOfProductions(), nil
 }
 
 func (p *parser) Reset() {
@@ -80,14 +100,15 @@ func (p *parser) Reset() {
 }
 
 func (p *parser) expand(g gr.Grammar, w []gr.Terminal) {
-	isTop, err := p.is.Top()
+	isTop, err := p.is.Pop()
 	if err != nil {
 		log.Fatal()
 	}
 	p.ws.Push(isTop)
 	p.ops.PushFront(firstProd)
 
-	prod := []gr.Symbol(g.Productions[isTop.(gr.NonTerminal)].GetProd(firstProd))
+	prods := g.Productions[isTop.(gr.NonTerminal)]
+	prod := prods.GetProd(firstProd)
 
 	for i := len(prod) - 1; i >= 0; i-- {
 		p.is.Push(prod[i])
@@ -120,6 +141,12 @@ func (p *parser) back(g gr.Grammar, w []gr.Terminal) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	if p.ops.Len() > 0 {
+		p.ops.Remove(p.ops.Front())
+
+	}
+
 	p.is.Push(t)
 }
 
@@ -129,6 +156,7 @@ func (p *parser) anotherTry(g gr.Grammar, w []gr.Terminal) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(lastOp)
 	nextProd := g.Productions[lastNonTerminal.(gr.NonTerminal)].GetProd(uint(lastOp + 1))
 	lastProd := g.Productions[lastNonTerminal.(gr.NonTerminal)].GetProd(uint(lastOp))
 
@@ -137,8 +165,9 @@ func (p *parser) anotherTry(g gr.Grammar, w []gr.Terminal) {
 		p.ops.Remove(p.ops.Front())
 		p.ops.PushFront(lastOp + 1)
 
-		for i := len(lastProd); i > 0; i-- {
-			if _, err := p.is.Pop(); err != nil {
+		for i := len(lastProd) - 1; i >= 0; i-- {
+			_, err := p.is.Pop()
+			if err != nil {
 				log.Fatal(err)
 			}
 		}
@@ -153,6 +182,14 @@ func (p *parser) anotherTry(g gr.Grammar, w []gr.Terminal) {
 		}
 
 		p.ops.Remove(p.ops.Front())
+
+		for i := len(lastProd) - 1; i >= 0; i-- {
+			_, err := p.is.Pop()
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
 		p.is.Push(lastNonTerminal.(gr.NonTerminal))
 	}
 }
@@ -164,16 +201,43 @@ func (p *parser) succes() {
 func (p *parser) getStringOfProductions() string {
 	syms := p.ws.List()
 
-	op := p.ops.Front()
+	op := p.ops.Back()
 	strBuilder := strings.Builder{}
 
 	for _, sym := range syms {
 		if !sym.IsTerminal() {
-			productionStr := fmt.Sprintf("%s %s, ", sym, op.Value)
+			productionStr := fmt.Sprintf("%s %d, ", sym, op.Value)
 			strBuilder.WriteString(productionStr)
 		}
-		op = op.Next()
+		op = op.Prev()
 	}
+
+	return strBuilder.String()
+}
+
+func (p parser) String() string {
+	strBuilder := strings.Builder{}
+
+	state := fmt.Sprintf("State: %d", p.state)
+	strBuilder.WriteString(state)
+	strBuilder.WriteString("\n")
+
+	index := fmt.Sprintf("Index: %d", p.index)
+	strBuilder.WriteString(index)
+	strBuilder.WriteString("\n")
+
+	strBuilder.WriteString("W. Stack: ")
+	strBuilder.WriteString(p.ws.String())
+	strBuilder.WriteString("\n")
+
+	strBuilder.WriteString("P. Index: ")
+	for e := p.ops.Front(); e != nil; e = e.Next() {
+		strBuilder.WriteString(fmt.Sprintf("%d ", e.Value))
+	}
+	strBuilder.WriteString("\n")
+
+	strBuilder.WriteString("I. Stack: ")
+	strBuilder.WriteString(p.is.String())
 
 	return strBuilder.String()
 }

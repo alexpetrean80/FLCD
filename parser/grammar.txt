@@ -1,4 +1,4 @@
-a,b,c,d
-S,A,B,C,D
-S~a$A,S~a$C,A~A$B,B~b,C~a$C,C~b$C$b,D~b$B,D~d
+a,b,c
+S
+S~a$S$b$S,S~a$S,S~c
 S

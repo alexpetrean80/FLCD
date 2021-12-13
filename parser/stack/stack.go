@@ -3,7 +3,9 @@ package stack
 import (
 	"container/list"
 	"errors"
+	"fmt"
 	g "parser/grammar"
+	"strings"
 )
 
 type Stack interface {
@@ -13,6 +15,7 @@ type Stack interface {
 	Peek(uint) (g.Symbols, error)
 	List() []g.Symbol
 	Empty() bool
+	fmt.Stringer
 }
 
 type stack struct {
@@ -82,9 +85,19 @@ func (s *stack) Empty() bool {
 func (s stack) List() []g.Symbol {
 	l := []g.Symbol{}
 
-	for e := s.l.Front(); e != nil; e = e.Next() {
+	for e := s.l.Back(); e != nil; e = e.Prev() {
 		l = append(l, e.Value.(g.Symbol))
 	}
 
 	return l
+}
+
+func (s stack) String() string {
+	strBuilder := strings.Builder{}
+
+	for e := s.l.Front(); e != nil; e = e.Next() {
+		strBuilder.WriteString(fmt.Sprintf("%s ", e.Value))
+	}
+
+	return strBuilder.String()
 }

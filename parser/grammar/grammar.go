@@ -9,10 +9,10 @@ import (
 )
 
 type Grammar struct {
-	Terminals      map[Terminal]bool          
-	NonTerminals   map[NonTerminal]bool       
-	StartingSymbol NonTerminal                
-	Productions    map[NonTerminal]Production 
+	Terminals      map[Terminal]bool
+	NonTerminals   map[NonTerminal]bool
+	StartingSymbol NonTerminal
+	Productions    map[NonTerminal]Production
 }
 
 func New(path string) *Grammar {
@@ -35,16 +35,16 @@ func New(path string) *Grammar {
 func (g Grammar) IsContextFree() bool {
 
 	return len(g.Terminals) != 0 &&
-	len(g.NonTerminals) != 0 &&
-	checkIntersectionOfNT(g.NonTerminals, g.Terminals) && 
-	g.StartingSymbol != "" &&
-	g.isStartInProductions()
+		len(g.NonTerminals) != 0 &&
+		checkIntersectionOfNT(g.NonTerminals, g.Terminals) &&
+		g.StartingSymbol != "" &&
+		g.isStartInProductions()
 }
 
 func checkIntersectionOfNT(nt map[NonTerminal]bool, t map[Terminal]bool) bool {
 	for kn, vn := range nt {
 		for kt, vt := range t {
-			if string(kt) == string(kn) && (vn && vt)  {
+			if string(kt) == string(kn) && (vn && vt) {
 				return false
 			}
 		}
@@ -55,14 +55,14 @@ func checkIntersectionOfNT(nt map[NonTerminal]bool, t map[Terminal]bool) bool {
 
 func (g Grammar) isStartInProductions() bool {
 	productions, ok := g.Productions[g.StartingSymbol]
-	if !ok { 
+	if !ok {
 		return false
 	}
 
 	return !productions.Empty()
 }
 
-func readFile(f *os.File) (lines []string){
+func readFile(f *os.File) (lines []string) {
 	scanner := bufio.NewScanner(f)
 	scanner.Split(bufio.ScanLines)
 
@@ -72,10 +72,8 @@ func readFile(f *os.File) (lines []string){
 	return lines
 }
 
-
-
-func getTerminals(line string) map[Terminal]bool{
-	terminalsStr := strings.Split(line,",")
+func getTerminals(line string) map[Terminal]bool {
+	terminalsStr := strings.Split(line, ",")
 	terminals := make(map[Terminal]bool)
 
 	for _, terminalStr := range terminalsStr {
@@ -84,8 +82,8 @@ func getTerminals(line string) map[Terminal]bool{
 	return terminals
 }
 
-func getNonTerminals(line string) map[NonTerminal]bool{
-	nonTerminalsStr := strings.Split(line,",")
+func getNonTerminals(line string) map[NonTerminal]bool {
+	nonTerminalsStr := strings.Split(line, ",")
 	nonTerminals := make(map[NonTerminal]bool)
 
 	for _, nonTerminalStr := range nonTerminalsStr {
@@ -93,7 +91,6 @@ func getNonTerminals(line string) map[NonTerminal]bool{
 	}
 	return nonTerminals
 }
-
 
 func getProductions(line string) (res map[NonTerminal]Production) {
 	res = make(map[NonTerminal]Production)
@@ -122,7 +119,7 @@ func getProductions(line string) (res map[NonTerminal]Production) {
 	return
 }
 
-func appendStr(sb *strings.Builder, str string){
+func appendStr(sb *strings.Builder, str string) {
 	if _, err := sb.WriteString(str); err != nil {
 		log.Fatal(err)
 	}
@@ -130,20 +127,20 @@ func appendStr(sb *strings.Builder, str string){
 func (g Grammar) String() string {
 	strBuilder := strings.Builder{}
 
-	appendStr(&strBuilder, "Terminals: ")
-	
+	appendStr(&strBuilder, "NonTerminals: ")
+
 	for nt := range g.NonTerminals {
 		appendStr(&strBuilder, fmt.Sprintf("%s ", nt))
 	}
-	
-	appendStr(&strBuilder, "\nNonTerminals: ")
+
+	appendStr(&strBuilder, "\nTerminals: ")
 	for t := range g.Terminals {
 		appendStr(&strBuilder, fmt.Sprintf("%s ", t))
 	}
 
 	appendStr(&strBuilder, "\nProductions: ")
-	for nt, p:= range g.Productions {
-		appendStr(&strBuilder, fmt.Sprintf("%s %s, ",nt, p))
+	for nt, p := range g.Productions {
+		appendStr(&strBuilder, fmt.Sprintf("%s %s, ", nt, p))
 	}
 
 	appendStr(&strBuilder, "\nStarting Symbol: ")
